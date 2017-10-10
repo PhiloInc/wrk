@@ -373,7 +373,9 @@ static void socket_connected(aeEventLoop *loop, int fd, void *data, int mask) {
     c->written = 0;
 
     aeCreateFileEvent(c->thread->loop, fd, AE_READABLE, socket_readable, c);
-    if (!c->delay_in_progress) {
+    if (c->delay_in_progress) {
+      aeDeleteFileEvent(c->thread->loop, fd, AE_WRITABLE);
+    } else {
       aeCreateFileEvent(c->thread->loop, fd, AE_WRITABLE, socket_writeable, c);
     }
 
